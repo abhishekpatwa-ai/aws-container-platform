@@ -1,18 +1,18 @@
 # ---------- The VPC (the "city") ----------
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
-  enable_dns_support   = true    # AWS DNS works inside the VPC
-  enable_dns_hostnames = true    # resources get DNS names (needed later for ECS, EKS, endpoints)
+  enable_dns_support   = true # AWS DNS works inside the VPC
+  enable_dns_hostnames = true # resources get DNS names (needed later for ECS, EKS, endpoints)
 
   tags = { Name = "learning-vpc" }
 }
 
 # ---------- Public subnets ----------
 resource "aws_subnet" "public_a" {
-  vpc_id                  = aws_vpc.main.id      # ← this subnet lives INSIDE the VPC
+  vpc_id                  = aws_vpc.main.id # ← this subnet lives INSIDE the VPC
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "eu-west-1a"
-  map_public_ip_on_launch = true                 # servers here get a public IP automatically
+  map_public_ip_on_launch = true # servers here get a public IP automatically
 
   tags = { Name = "public-a", Tier = "public" }
 }
@@ -46,7 +46,7 @@ resource "aws_subnet" "private_b" {
 
 # ---------- Internet Gateway: the door ----------
 resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id               # attach the door to our VPC
+  vpc_id = aws_vpc.main.id # attach the door to our VPC
 
   tags = { Name = "learning-igw" }
 }
@@ -56,8 +56,8 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block = "0.0.0.0/0"                         # "everything else..."
-    gateway_id = aws_internet_gateway.main.id        # "...goes out through the IGW"
+    cidr_block = "0.0.0.0/0"                  # "everything else..."
+    gateway_id = aws_internet_gateway.main.id # "...goes out through the IGW"
   }
   # the local route (10.0.0.0/16 → local) is added automatically. Don't write it.
 
@@ -108,12 +108,12 @@ resource "aws_eip" "nat" {
 # ---------- NAT Gateway: lives in a PUBLIC subnet ----------
 resource "aws_nat_gateway" "main" {
   count         = var.enable_nat_gateway ? 1 : 0
-  allocation_id = aws_eip.nat[0].id           # attach the Elastic IP
-  subnet_id     = aws_subnet.public_a.id      # PUBLIC subnet, so it can use the IGW
+  allocation_id = aws_eip.nat[0].id      # attach the Elastic IP
+  subnet_id     = aws_subnet.public_a.id # PUBLIC subnet, so it can use the IGW
 
   tags = { Name = "learning-nat" }
 
-  depends_on = [aws_internet_gateway.main]    # the IGW must exist first
+  depends_on = [aws_internet_gateway.main] # the IGW must exist first
 }
 
 # ---------- Routes: private subnets → NAT ----------
@@ -128,7 +128,7 @@ resource "aws_route" "private_b_nat" {
   count                  = var.enable_nat_gateway ? 1 : 0
   route_table_id         = aws_route_table.private_b.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.main[0].id    # both use the same NAT (single-NAT design)
+  nat_gateway_id         = aws_nat_gateway.main[0].id # both use the same NAT (single-NAT design)
 }
 
 # ================= Security groups =================
@@ -173,7 +173,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb_http" {
 resource "aws_vpc_security_group_egress_rule" "alb_to_app" {
   security_group_id            = aws_security_group.alb.id
   description                  = "ALB may only talk to the app on 8080"
-  referenced_security_group_id = aws_security_group.app.id     # ← SG referencing SG
+  referenced_security_group_id = aws_security_group.app.id # ← SG referencing SG
   ip_protocol                  = "tcp"
   from_port                    = 8080
   to_port                      = 8080
@@ -183,7 +183,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_app" {
 resource "aws_vpc_security_group_ingress_rule" "app_from_alb" {
   security_group_id            = aws_security_group.app.id
   description                  = "8080 only from the ALB security group"
-  referenced_security_group_id = aws_security_group.alb.id     # ← not an IP!
+  referenced_security_group_id = aws_security_group.alb.id # ← not an IP!
   ip_protocol                  = "tcp"
   from_port                    = 8080
   to_port                      = 8080
@@ -193,7 +193,7 @@ resource "aws_vpc_security_group_egress_rule" "app_all_out" {
   security_group_id = aws_security_group.app.id
   description       = "App can reach the internet via NAT (updates, APIs)"
   cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"                                       # -1 = all protocols, all ports
+  ip_protocol       = "-1" # -1 = all protocols, all ports
 }
 
 # ---------- Lock down the default security group (CIS best practice) ----------

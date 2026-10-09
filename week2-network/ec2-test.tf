@@ -50,16 +50,16 @@ resource "aws_security_group" "test" {
 resource "aws_vpc_security_group_ingress_rule" "test_icmp_from_vpc" {
   security_group_id = aws_security_group.test.id
   description       = "Ping from inside the VPC only"
-  cidr_ipv4         = aws_vpc.main.cidr_block    # 10.0.0.0/16, NOT the internet
+  cidr_ipv4         = aws_vpc.main.cidr_block # 10.0.0.0/16, NOT the internet
   ip_protocol       = "icmp"
-  from_port         = -1                          # -1 = all ICMP types
+  from_port         = -1 # -1 = all ICMP types
   to_port           = -1
 }
 
 resource "aws_vpc_security_group_egress_rule" "test_all_out" {
   security_group_id = aws_security_group.test.id
   cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1"                        # needed for SSM, updates and curl
+  ip_protocol       = "-1" # needed for SSM, updates and curl
 }
 
 # ---------- The two test servers ----------
@@ -67,12 +67,12 @@ resource "aws_instance" "public" {
   count                  = var.enable_test_instances ? 1 : 0
   ami                    = data.aws_ssm_parameter.al2023.value
   instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.public_a.id          # PUBLIC subnet → gets a public IP
+  subnet_id              = aws_subnet.public_a.id # PUBLIC subnet → gets a public IP
   vpc_security_group_ids = [aws_security_group.test.id]
   iam_instance_profile   = aws_iam_instance_profile.ssm.name
 
   metadata_options {
-    http_tokens = "required"    # IMDSv2 only (security best practice, explained below)
+    http_tokens = "required" # IMDSv2 only (security best practice, explained below)
   }
 
   tags = { Name = "test-public" }
@@ -82,7 +82,7 @@ resource "aws_instance" "private" {
   count                  = var.enable_test_instances ? 1 : 0
   ami                    = data.aws_ssm_parameter.al2023.value
   instance_type          = "t3.micro"
-  subnet_id              = aws_subnet.private_a.id         # PRIVATE subnet → no public IP
+  subnet_id              = aws_subnet.private_a.id # PRIVATE subnet → no public IP
   vpc_security_group_ids = [aws_security_group.test.id]
   iam_instance_profile   = aws_iam_instance_profile.ssm.name
 
