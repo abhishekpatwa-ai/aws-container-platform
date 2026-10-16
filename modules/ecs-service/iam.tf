@@ -93,6 +93,7 @@ data "aws_iam_policy_document" "deploy" {
       "ecr:GetDownloadUrlForLayer",
       "ecr:DescribeImages",
       "ecr:DescribeImageScanFindings",
+      "ecr:StartImageScan", # scan na chala ho to pipeline khud shuru kare
     ]
     resources = [aws_ecr_repository.this.arn]
   }
