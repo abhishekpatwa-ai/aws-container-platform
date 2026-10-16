@@ -5,8 +5,10 @@
 #   deploy role    → service ki GitHub repo (OIDC): sirf ISI service ko deploy kar sake
 
 locals {
-  account_id = data.aws_caller_identity.current.account_id
-  region     = data.aws_region.current.region
+  account_id       = data.aws_caller_identity.current.account_id
+  region           = data.aws_region.current.region
+  github_owner     = split("/", var.github_repo)[0] # abhishekpatwa-ai
+  github_repo_name = split("/", var.github_repo)[1] # uconia-api
 }
 
 # ---------- Trust: ECS tasks ye roles pehen sakte hain ----------
@@ -50,10 +52,17 @@ data "aws_iam_policy_document" "github_assume" {
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
+    # GitHub ka naya 'sub' format naam ke saath numeric IDs bhejta hai:
+    #   repo:abhishekpatwa-ai@336658880/uconia-api@1422089262:ref:refs/heads/main
+    # IDs kabhi nahi badalte: koi repo delete karke SAME NAAM se nayi bana le, to bhi deploy nahi kar paayega.
+    # Purana format (sirf naam) bhi allow hai, taaki dono tarah ke tokens chalein.
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+      values = [
+        "repo:${local.github_owner}@${var.github_owner_id}/${local.github_repo_name}@${var.github_repo_id}:ref:refs/heads/main",
+        "repo:${var.github_repo}:ref:refs/heads/main",
+      ]
     }
   }
 }

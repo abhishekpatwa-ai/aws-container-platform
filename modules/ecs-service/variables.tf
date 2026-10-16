@@ -7,6 +7,16 @@ variable "name" {
   type        = string
 }
 
+variable "github_owner_id" {
+  description = "GitHub owner (user/org) ka numeric ID. GitHub ab OIDC 'sub' mein naam ke saath ID bhi bhejta hai"
+  type        = number
+}
+
+variable "github_repo_id" {
+  description = "GitHub repo ka numeric ID (https://api.github.com/repos/OWNER/REPO se 'id')"
+  type        = number
+}
+
 variable "github_repo" {
   description = "Service ki GitHub repo (owner/name). Sirf isi repo ki main branch deploy kar paayegi"
   type        = string

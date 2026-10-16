@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "first" {
-  bucket = var.bucket_name            # value comes from terraform.tfvars
+  bucket = var.bucket_name # value comes from terraform.tfvars
 
   tags = {
     Purpose = "first-lesson"
@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "first" {
 }
 
 resource "aws_s3_bucket_versioning" "first" {
-  bucket = aws_s3_bucket.first.id     # ← reference to the bucket above
+  bucket = aws_s3_bucket.first.id # ← reference to the bucket above
 
   versioning_configuration {
     status = "Enabled"
@@ -20,7 +20,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "first" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"         # SSE-S3: AWS-managed keys
+      sse_algorithm = "AES256" # SSE-S3: AWS-managed keys
     }
   }
 }

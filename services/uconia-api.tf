@@ -7,6 +7,8 @@ module "uconia_api" {
   # --- Service ki apni values ---
   name              = "uconia-api"
   github_repo       = "abhishekpatwa-ai/uconia-api" # sirf is repo ki main branch deploy kar sakti hai
+  github_owner_id   = 336658880                     # api.github.com/users/abhishekpatwa-ai → "id"
+  github_repo_id    = 1422089262                    # api.github.com/repos/abhishekpatwa-ai/uconia-api → "id"
   path_pattern      = "/api/*"
   listener_priority = 100
 

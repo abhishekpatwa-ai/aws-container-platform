@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "tfstate" {
-  bucket = "abhishek-tfstate-7391"      # numbers badal lo
+  bucket = "abhishek-tfstate-7391" # numbers badal lo
 
   lifecycle {
-    prevent_destroy = true              # Terraform is bucket ko kabhi delete nahi karega
+    prevent_destroy = true # Terraform is bucket ko kabhi delete nahi karega
   }
 }
 
